@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <!-- uncomment the next line when deploying on MTurk -->
+    <script src="https://assets.crowd.aws/crowd-html-elements.js" nonce="rAnd0m"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script nonce="rAnd0m" src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"
+        nonce="rAnd0m"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/smart_wizard.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/smart_wizard_theme_dots.min.css" rel="stylesheet"
+        type="text/css" />
+    <style>
+        .btn-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+
+        }
+    </style>
+    <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval'  https://assets.crowd.aws/; object-src 'self';" />    -->
+
+</head>
+
+<body id="main-body" style="background-color:#FFFFFF">
+    <div class="modal fade" tabindex="-1" role="dialog" id="warning-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Not enough inputs yet!</h5>
+                </div>
+                <div class="modal-body d-flex align-items-top justify-content-start text-left">
+                    Please make sure that you have entered at least 10 inputs/sentences before going to the next
+                    chatbot, thanks! The number of inputs you've entered so far is displayed at the top of the screen.
+
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="error-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+                </div>
+                <div class="modal-body" id="error-modal-body">
+                    <p>An error occurs and it has been recorded. Please close this warinng and re-try.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="empty-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Invalid input</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Your input is empty, please retry</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /home/rqureshi/New-Noahs-Ark/models/blender_2 -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="topic-modal" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title text-sm-left font-weight-bold" id="topic-modal-title">Please think of a topic
+                        to discuss with the chatbot and enter it below</h6>
+                </div>
+                <div class="modal-body" id="topic-modal-body">
+
+                </div>
+
+                <div class="modal-footer" id="topic-modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chatbot-panel" class="container-fluid text-center">
+        <div id="instruction-panel" class="justify-content-center mt-1 border rounded">
+            <div class="row d-flex align-items-center justify-content-center">
+
+                <div class="col d-flex align-items-center justify-content-center">
+                    <div id="task-counter">
+                        You have completed conversations with <b>0</b> chatbots.
+                    </div>
+                </div>
+
+            </div>
+            <div class="row d-flex align-items-center justify-content-center">
+
+                <div class="col d-flex align-items-center justify-content-center">
+                    <div id="round-counter">
+                        You have given <b>0</b> inputs already with this chatbot.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div id="message-panel" class="text-center border rounded">
+
+        </div>
+        <div id="topic-panel" class="rounded">
+            <div class="row d-flex align-items-center">
+                <div class="col-1 d-flex align-items-center justify-content-end text-truncate"></div>
+                <div class="col-1 d-flex align-items-center justify-conten  t-end text-truncate">Topic:</div>
+                <div class="col d-flex align-items-center justify-content-start text-truncate" id="topic-display"></div>
+                <!-- <div class="col-1 d-flex align-items-center justify-content-end text-truncate">Original Topic:</div> -->
+                <!-- <div class="col d-flex align-items-center justify-content-start text-truncate" id="topic-display-original"></div> -->
+                <div class="col-1 d-flex align-items-center justify-content-end text-truncate"></div>
+            </div>
+        </div>
+
+        <div class="text-center d-flex align-items-center justify-content-center" id="send-panel">
+            <div class="input-group">
+                <div class="input-group-append align-items-center">
+                    <button class="btn btn-sm btn-outline-success rounded mr-sm-1" id="trigger-topic" type="button"
+                        onclick="show_topic_modal();">Topic</button>
+                </div>
+
+                <input type="text" autocomplete="off" class="form-control rounded mr-sm-1"
+                    placeholder="Please type here" id="send-input">
+
+                <div class="input-group-append align-items-center">
+                    <button class="btn btn-sm btn-outline-primary rounded mr-sm-1" type="button" id="send-btn"
+                        onclick="send_response();">Send</button>
+                    <button class="btn btn-sm btn-outline-info rounded" type="button" id="rate-btn"
+                        onclick="to_rate();">Next Chatbot</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="container-fluid text-center" id="rate-panel">
+        <div id="instruction2-panel" class="justify-content-center mt-1 pt-3 pb-3 border-0 rounded">
+            Please state how much you agree with the following statements about the chatbot you just talked with.
+        </div>
+        <div id="rate-slider-panel" class="justify-content-left mt-5 border rounded">
+            <div class="row d-flex align-items-center justify-content-center mt-2">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The chatbot's statements were intelligent.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="humanlike_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mt-2">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The conversation was interesting.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="interest_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    I learned new information from the conversation.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="fun_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The chatbot used fluent English.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="consistent_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The chatbot's statements lacked credibility.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="fluent_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The chatbot's statements were inconsistent.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="inconsistent_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The conversation with the chatbot was difficult to understand/follow.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="topic_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-start">
+                    The chatbot was repetitive.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+            </div>
+            <div class="row d-flex align-items-center justify-content-center mb-4 mt-1">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+                    0
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <input type="range" class="form-control-range rate-range" id="repetitive_range">
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+                    100
+                </div>
+            </div>
+
+        </div>
+        <div id="instruction2-panel" class="justify-content-center mt-1 pt-3 pb-3 border-0 rounded">
+
+            <Button type="button" class="btn btn-primary" onclick="to_chat()">NEXT</Button>
+        </div>
+
+    </div>
+
+    <div class="container-fluid text-right" id="submit-div">
+        <crowd-form id="submit-form">
+
+            <div class="row border-0 mt-3 mb-3">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    Thanks for your help. Please leave your feedback here.
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+
+            </div>
+            <div class="row border-0 mt-3 mb-3">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+                    <textarea class="form-control" rows="5" name="feedback"></textarea>
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+
+            </div>
+            <div class="row border-0 mt-3 mb-3">
+                <div class="col-3 d-flex align-items-center justify-content-end">
+
+                </div>
+                <div class="col d-flex align-items-center justify-content-center">
+
+
+                    <crowd-button form-action="submit" variant="primary">Submit</crowd-button>
+
+                </div>
+                <div class="col-3 d-flex align-items-center justify-content-start">
+
+                </div>
+                <!-- <input id="dialogue" name="dialogue" hidden>
+        <input id="rate" name="rate" hidden>
+        <input id="error-message" name="error-message" hidden>
+
+        <input id="quality-control" name="quality-control" hidden>
+         -->
+            </div>
+        </crowd-form>
+    </div>
+    <div class="container-fluid text-center" id="welcome-panel">
+        <!-- <div class="row border-0 mt-1 mb-2">
+            <div class="col-3"></div>
+             <div class="col d-flex align-items-center justify-content-start">
+                <b>Task introduction and instruction:</b>
+             </div>
+            <div class="col-2"></div>
+            
+        </div> -->
+        <div class="container py-3 my-3 border rounded shadow-sm">
+            <div class="row">
+                <section class="col-12">
+                    <ul class="nav nav-tabs flex-nowrap" role="tablist">
+                        <li role="presentation" class="nav-item">
+                            <!-- <a href="#step1" class="nav-link active" data-toggle="tab" aria-controls="step1" role="tab" title="Step 1"> 1 </a> -->
+                            <a href="#step1" class="nav-link active" data-toggle="tab" role="tab" title="Step 1">
+                                Information Sheet </a>
+                        </li>
+                        <li role="presentation" class="nav-item">
+                            <a href="#step2" class="nav-link disabled" data-toggle="tab" aria-controls="step2"
+                                role="tab" title="Step 2"> Consent Form </a>
+                        </li>
+                        <li role="presentation" class="nav-item">
+                            <a href="#step3" class="nav-link disabled" data-toggle="tab" aria-controls="step3"
+                                role="tab" title="Step 3"> HIT Instructions </a>
+                        </li>
+                        <!-- <li role="presentation" class="nav-item">
+                            <a href="#complete" class="nav-link disabled" data-toggle="tab" aria-controls="complete" role="tab" title="Complete"> 4 </a>
+                        </li> -->
+                    </ul>
+                    <form role="form">
+                        <div class="tab-content py-2" style="font-family:'Calibri'">
+                            <div class="tab-pane active" role="tabpanel" id="step1" style="font-family:'Calibri'">
+                                <h3>Information Sheet</h3>
+                                <p align="center" style="font-family:'Calibri'"><u>Please use Chrome browser only</u>.
+                                </p>
+                                <p align="justify" style="font-family:'Calibri'">
+                                    You are invited to participate in this study on automatic language generation which
+                                    aims to evaluate the quality of language generated automatically by a computer
+                                    program. This study is being carried out by ADAPT in the School of Computer Science
+                                    and Statistics at Trinity College Dublin. We are seeking participants over the age
+                                    of 18 years who are native <English /German/Spanish/French ...> speakers and are
+                                        capable of identifying grammar or spelling mistakes in that language. <br><br>
+                                        You will be asked to read some text that was produced automatically by a
+                                        computer program and to rate its quality, for example, in terms of its fluency
+                                        or meaning. In the case of evaluating the meaning of some text, you will have a
+                                        reference text to compare the automatic text with, and your task will be to rate
+                                        how similar the meaning is between the two.<br><br>
+                                        We expect the experiment to take approximately one hour in total.<br><br>
+                                        Mechanical Turk participants will be paid as soon as possible and within a
+                                        maximum of 1
+                                        week of successful completion of the work. Due to the anonymous nature of the
+                                        crowdsourcing platform, participation will be checked for satisfactory
+                                        completion of tasks. Random
+                                        changes or hits containing text that is not corrected or rated properly by
+                                        participants will
+                                        not be paid. Participants should be aware that submission of low quality answers
+                                        will result
+                                        in rejection of hits which can adversely affect a worker’s reliability rating on
+                                        the platform.
+                                        For example, if a low quality sequence of characters is inserted into the text
+                                        instead of a
+                                        genuine attempt at correcting the text, the HIT will be rejected. Where ratings
+                                        are
+                                        requested if those ratings do not represent the quality of the text, the HIT
+                                        will be rejected.<br><br>
+                                        The experiment consists of a single HIT made up of a maximum of ten documents
+                                        and
+                                        Mechanical Turk participants will be paid for this experiment as a
+                                        whole.<br><br>
+                                        A minimum rating of 95% previous approval is applied and participants on Mturk
+                                        who fall
+                                        below this approval rating cannot participate.<br><br>
+                                        We will record your ratings on a secure server in the School of Computer Science
+                                        and Statistics. We will retain the data you provide for at least 10 years for
+                                        research integrity purposes. Since ratings are anonymous and not personal in
+                                        nature, the data you provide be retained beyond this 10 year period to
+                                        facilitate potential ongoing research activities. The data may be published in a
+                                        paper, and essentially available indefinitely. The purpose of storing and
+                                        processing this data is to conduct research (the legal basis).<br>
+                                        We do not anticipate any risks to participants. As the study does not involve
+                                        sensitive information, there is no risk to the privacy of the participant in
+                                        terms of sensitive data. The research will support the development of better
+                                        automated language tools, which we hope will benefit the general public.<br><br>
+                                        Your participation is entirely voluntary, and you can withdraw at any time up
+                                        until submitting your ratings. As there is no way for us (or anyone else) to
+                                        identify an individual participant once data is fully anonymised, it will no
+                                        longer be possible to withdraw from the study after you have submitted your
+                                        ratings.<br><br>
+                                        The purpose of this study is to collect ratings of the quality of language that
+                                        has been produced automatically by a computer program. Each piece of text you
+                                        read should therefore be rated and in order to participate the provision of
+                                        ratings is not optional.<br><br>
+                                        The data will be analysed in order to evaluate the performance of software that
+                                        generates language. We plan to publish the results of our research in academic
+                                        journals and conference proceedings. We will do this in a way which does not
+                                        identify you, or any other individual participant.<br><br>
+                                        While it is unlikely that illicit activities would be disclosed, if you do so,
+                                        we would be obliged to report them to the appropriate authorities. Likewise,
+                                        identification of any third party will be removed for anonymisation
+                                        purposes.<br><br>
+                                        Since recruitment is via an online web service and fully anonymous, there is no
+                                        conflict of interest in terms of experiment results and relationship with the
+                                        researchers.<br><br>
+                                        If you have any queries, feel free to contact Prof. Graham at ygraham@tcd.ie,
+                                        and we will be happy to answer questions about the experiment.
+                                        Data Controllers: Trinity College Dublin
+                                        Data Protection Officer: Data Protection Officer, Secretary’s Office, Trinity
+                                        College Dublin, Dublin 2 - <a
+                                            href="mailto:dataprotection@tcd.ie">dataprotection@tcd.ie</a>
+
+                                </p>
+                                <button type="button" class="btn btn-primary next-step float-right">Next</button>
+                            </div>
+                            <div class="tab-pane" role="tabpanel" id="step2">
+                                <h3>Informed Consent Form</h3>
+                                <p align="justify" style="font-family:'Calibri'">
+
+                                    LEAD RESEARCHERS: Prof. Graham, SCSS, TCD <br><br>
+                                    BACKGROUND OF RESEARCH: You are invited to participate in this study on automatic
+                                    language generation which aims to evaluate the quality of language generated
+                                    automatically by a computer program. This study is being carried out by ADAPT in the
+                                    School of Computer Science and Statistics at Trinity College Dublin. We are seeking
+                                    participants over the age of 18 years who are native <English /German/Spanish/French
+                                        ...> speakers and are capable of identifying grammar or spelling mistakes in
+                                        that language.<br><br>
+                                        PROCEDURES OF THIS STUDY: In this study, you will be asked to read or listen to
+                                        some text that has been automatically generated by a computer program and rate
+                                        its quality.<br><br>
+                                        Mechanical Turk participants will be paid as soon as possible and within a
+                                        maximum of 1
+                                        week of successful completion of the work. Due to the anonymous nature of the
+                                        crowdsourcing platform, participation will be checked for satisfactory
+                                        completion of tasks. Random
+                                        changes or hits containing text that is not corrected or rated properly by
+                                        participants will
+                                        not be paid. Participants should be aware that submission of low quality answers
+                                        will result
+                                        in rejection of hits which can adversely affect a worker’s reliability rating on
+                                        the platform.
+                                        For example, if a low quality sequence of characters is inserted into the text
+                                        instead of a
+                                        genuine attempt at correcting the text, the HIT will be rejected. Where ratings
+                                        are
+                                        requested if those ratings do not represent the quality of the text, the HIT
+                                        will be rejected.
+                                        The experiment consists of a single HIT made up of a maximum of ten documents
+                                        and
+                                        Mechanical Turk participants will be paid for this experiment as a whole.
+                                        A minimum rating of 95% previous approval is applied and participants on Mturk
+                                        who fall
+                                        below this approval rating cannot participate.<br><br>
+
+                                        Mechanical Turk participants will be paid as soon as possible and within a
+                                        maximum of 1
+                                        week of successful completion of the work. Due to the anonymous nature of the
+                                        crowd-
+                                        sourcing platform, participation will be checked for satisfactory completion of
+                                        tasks. Random
+                                        changes or hits containing text that is not corrected or rated properly by
+                                        participants will
+                                        not be paid. Participants should be aware that submission of low quality answers
+                                        will result
+                                        in rejection of hits which can adversely affect a worker’s reliability rating on
+                                        the platform.
+                                        For example, if a low quality sequence of characters is inserted into the text
+                                        instead of a
+                                        genuine attempt at correcting the text, the HIT will be rejected. Where ratings
+                                        are
+                                        requested if those ratings do not represent the quality of the text, the HIT
+                                        will be rejected.<br><br>
+                                        The experiment consists of a single HIT made up of a maximum of ten documents
+                                        and
+                                        Mechanical Turk participants will be paid for this experiment as a
+                                        whole.<br><br>
+                                        A minimum rating of 95% previous approval is applied and participants on Mturk
+                                        who fall
+                                        below this approval rating cannot participate.<br><br>
+
+                                        PUBLICATION: We will provide details of the outcome of this study as a
+                                        publication in a conference proceedings or journal article.
+                                        Individual results may be aggregated anonymously and research reported on
+                                        aggregate results.
+
+                                        DECLARATION:
+                                        <ul align="justify" style="font-family:'Calibri'">
+                                            <li>I am 18 years or older and am competent to provide consent.</li>
+                                            <li>I have read, or had read to me, a document providing information about
+                                                this research and this consent form. I have had the opportunity to ask
+                                                questions and all my questions have been answered to my satisfaction and
+                                                understand the description of the research that is being provided to me.
+                                            </li>
+                                            <li>I agree that my data is used for scientific purposes and I have no
+                                                objection that my data is published in scientific publications in a way
+                                                that does not reveal my identity.</li>
+                                            <li>I understand that if I make illicit activities known, these will be
+                                                reported to appropriate authorities.</li>
+                                            <li>I understand that I may refuse to answer any question and that I may
+                                                withdraw at any time prior to submitting the data without penalty. You
+                                                can withdraw from the experiment by clicking the exit experiment button.
+                                            </li>
+                                            <li>It will not be possible to withdraw once you have submitted your
+                                                ratings.</li>
+                                            <li>I understand that if the results of the research have been published, or
+                                                my data has been fully anonymised so that it can no longer be attributed
+                                                to me, then it will no longer be possible to withdraw.</li>
+                                            <li>I freely and voluntarily agree to be part of this research study, though
+                                                without prejudice to my legal and ethical rights.</li>
+                                            <li>I understand that my participation is fully anonymous and that no
+                                                personal details about me will be recorded.</li>
+                                            <li>I understand that if I or anyone in my family has a history of epilepsy
+                                                then I am proceeding at my own risk.</li>
+                                            <li>I understand that personal information about me, including the transfer
+                                                of this personal information about me outside of the EU, will be
+                                                protected in accordance with the General Data Protection Regulation.
+                                            </li>
+                                            <li>I have received a copy of this agreement.</li>
+                                        </ul>
+                                        <p align="justify" style="font-family:'Calibri'">
+                                            By signing this document I consent to participate in this study, and consent
+                                            to the data processing necessary to enable my participationand to achieve
+                                            the research goals of this study. It should be noted that the anonymised
+                                            ratings you provide will be made publicly available for research
+                                            purposes and is therefore likely to be subject to secondary data analysis.
+                                        </p>
+
+                                </p>
+                                <ul class="float-right">
+                                    <li class="list-inline-item">
+                                        <button type="button" class="btn btn-outline-primary prev-step">Decline</button>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <button type="button" class="btn btn-primary next-step">Agree</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-pane" role="tabpanel" id="step3">
+                                <h3>HIT Instructions</h3>
+                                <ul align="justify" style="font-size:130%;">
+
+                                    <!-- <li>Your task is to have 5 conversations with a chatbot, and a different chatbot will talk to you in each conversation.</li>
+                                        <li>At the end of each conversation, you should tell us what you think about the chatbot.</li>
+                                        <li>In each conversation, you should type in a minimum of 10 inputs/sentences.</li>
+                                        <li>The purpose of these HITs where you will generate conversations with chatbots is to test how realistic their conversations are with users. In order for your data to be useful to us we require that your half of the conversation is also realistic. For example, your data will not be useful to us if you do the following: <br>User: Hi
+                                            <br>Bot: Hi
+                                            <br>User: Hi
+                                            <br>Bot: Hi.. and so on.</li>
+                                        <li>Another example, if you are too repetitive or your responses are not appropriate given what the chatbot has just said, this will not be a useful test for them. For example, the following conversation is not ok:
+                                            User: Hi<br>
+                                            Bot: Hi<br>
+                                            User: wow (not appropriate response)<br>
+                                            Bot: I saw a good movie last night<br>
+                                            User: wow (repetitive)<br>
+                                            Bot: Do you like football?<br>
+                                            User: I have two children and one dog. (not appropriate response)<br>.. and so on.</li>
+                                        <li>We need realistic conversations, so please do your best to talk to the bot as if the bot was another person you actually want to talk to. Obvious attempts to game the process and ones that don't make a real effort will unfortunately be rejected.</li>
+                                        <li>The chatbot may take a few seconds to respond, please be patient.</li>
+                                        <li>Please use Chrome if possible.</li>
+                                        <li>Please avoid special symbols.</li>
+                                        <li>There is a feedback box at the end of the HIT. If you encounter any problems, please enter them in this box or email our MTurk account.</li>
+                                         -->
+
+                                    <li>Your task in this hit is to have 5 conversations, each with a different chatbot.
+                                    </li>
+                                    <li>In each conversation, you should type in a minimum of 10 inputs/responses to the
+                                        chatbot.</li>
+                                    <li>At the end of each conversation, you should tell us what you think about the
+                                        chatbot.</li>
+                                    <li>The purpose of the HIT is to test how intelligent each chatbot's conversation
+                                        ability is. In order for your data to be useful , we require that the turker
+                                        side of the conversation is realistic and intelligent.
+                                        Please do not:
+                                        <ul>
+                                            <li>Repeatedly give very short answers</li>
+                                            <li>Not take into account what the chatbot says to you</li>
+                                            <li>Be overly repetitive</li>
+                                        </ul>
+                                    </li>
+                                    <li>We need realistic conversations, so please do your best to talk to the bot as if
+                                        the bot was another person you actually want to talk to.</li>
+                                    <li>We quality check hits very closely - obvious attempts to game the process and
+                                        ones that don't make a real effort will be rejected.</li>
+                                    <li>The chatbot may take a few seconds to respond, please be patient.</li>
+                                    <li>Please avoid special symbols, standard punctuation such as ? etc are fine to
+                                        include.</li>
+                                    <li><u>Please use Chrome browser only</u></li>
+                                </ul>
+                                <ul class="float-right">
+                                    <li class="list-inline-item">
+                                        <button type="button"
+                                            class="btn btn-outline-primary prev-step">Previous</button>
+                                    </li>
+                                    <!-- <li class="list-inline-item">
+                                        <button type="button" class="btn btn-outline-primary next-step">Skip</button>
+                                    </li> -->
+                                    <li class="list-inline-item">
+                                        <button onclick="initDialogue()" type="button"
+                                            class="btn btn-primary btn-info-full next-step">Start</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- <div class="tab-pane" role="tabpanel" id="complete">
+                                <h3>Complete!</h3>
+                                <p>You have successfully completed all steps.</p>
+                            </div> -->
+                            <div class="clearfix"></div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+</body>
+
+<footer>
+    <script>
+        $(document).ready(function () {
+
+
+            document.querySelector('crowd-form').onsubmit = function (e) {
+                if (!validateForm()) {
+
+                e.preventDefault();
+                alert("Please fill in the form.");
+                }
+                var formData = document.getElementById("score0").value;
+                console.log(formData);
+                // alert("Succesfully submitted! Thank you for your participation.");
+
+            }
+
+    function validateForm() {
+        var isValid = true;
+        for (var i = 0; i <= 0; i++) {
+            var scoreValue = document.getElementById("score" + i).value;
+            if (scoreValue.trim() === "") {
+                isValid = false;
+                break;
+            }
+        }
+        return isValid;
+    }
+
+
+            //Initialize tooltips
+            $('.nav-tabs > li a[title]').tooltip();
+
+            //Wizard
+            $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+                var $target = $(e.target);
+                if ($target.parent().hasClass('disabled')) {
+                    return false;
+                }
+            });
+
+            $(".next-step").click(function (e) {
+                var $active = $('.nav-tabs li>.active');
+                $active.parent().next().find('.nav-link').removeClass('disabled');
+                nextTab($active);
+            });
+
+            $(".prev-step").click(function (e) {
+                var $active = $('.nav-tabs li>a.active');
+                $active.parent().find('.nav-link').addClass('disabled');
+                prevTab($active);
+            });
+        });
+
+        var textbox = document.getElementById("send-input");
+        textbox.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.getElementById("send-btn").click();
+                //add a line to retain the cursor in text field
+                textbox.focus();
+            }
+        });
+
+
+        function nextTab(elem) {
+            $(elem).parent().next().find('a[data-toggle="tab"]').click();
+        }
+        function prevTab(elem) {
+            $(elem).parent().prev().find('a[data-toggle="tab"]').click();
+        }
+
+        let base_url = "https://qrameez.adaptcentre.ie"//"http://134.226.42.43:5000"  //"https://qrameez.adaptcentre.ie" // change it to the real url when deploying on MTurk
+        let all_hits = ["blenderbot", "scichat3","scichat2","scichat1","bart","dialogpt","vanilla_dialogpt", "qc"];//["bart", "dialogpt", "qc", 'vanilla_dialogpt', 'vanilla_blenderbot_small']////["qc"]//["bart","dialogpt","qc",'vanilla_dialogpt','vanilla_blenderbot_small']; // uncomment this line and comment next line for locally debugging
+ 
+
+
+
+        let current_task = "";
+        let [total_task, counter_round, counter_task, counter_error] = [all_hits.length, 0, 0, 0];
+
+
+        let max_len = all_hits.length - 1;
+        let min_round = 0; // minimal number of rounds, in our paper it is 10
+
+        let dialogue_start = true;
+        const to_complete = () => {
+            $("#rate-panel").hide();
+            $("#chatbot-panel").hide();
+
+            $("#submit-div").show();
+        }
+        const to_rate = () => {
+            // console.log($("#dialogue"+counter_task).val());
+            if (counter_round < min_round) {
+                $('#warning-modal').modal('show');
+
+            }
+            else {
+                $(".rate-range").val(50);
+                $("#chatbot-panel").hide();
+                $("#rate-panel").show();
+                $("trigger-topic").prop("disabled", false);
+            }
+
+        }
+
+
+
+        const to_chat = () => {
+            let all_score = "";
+            $(".rate-range").each(function () {
+                all_score = all_score + $(this).val() + "#";
+            });
+            $("#score" + counter_task).val(all_score);
+            $("#trigger-topic").prop("disabled", false);
+            // console.log( $("#score"+counter_task).val())
+            if (counter_task < max_len) {
+                counter_round = 0;
+                counter_task++;
+                $("#task-counter").html("You have completed conversations with <b>" + counter_task + "</b> chatbots.");
+                $("#round-counter").html("You have given <b>0</b> inputs already with this chatbot.")
+
+                initDialogue();
+                // if (counter_round < min_round){
+                //     document.getElementById("rate-btn").disabled = true;
+                //     // $("rate-btn").attr("disabled",true);
+                // }
+                // else{
+                //     // $("rate-btn").attr("disabled",false);
+                //     document.getElementById("rate-btn").disabled = false;
+                // }
+            }
+            else {
+                to_complete();
+            }
+
+        }
+
+
+        const post = (url, data) => {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: data,
+                    timeout: 10000000,
+
+                    success: res => {
+                        resolve(res)
+                    },
+                    error: error => {
+                        reject(error)
+                    }
+                });
+            }
+            ).catch((error) => {
+
+                counter_error++;
+                let error_message = $("#error-message").val();
+                let user_input = $("#send-input").val();
+
+                error_message += "t" + counter_task + "r" + counter_round + "@@" + error.statusText + "@@" + user_input + "###url:" + url + " || ";
+
+                $("#error-message").val(error_message);
+                $("#error-modal-body").html("<p>An error occurs (<b><i>" + error.statusText + "</i></b>) and has been recorded for further analysis.</p><p>Please close this message and re-try.</p>");
+                $("#error-modal").modal("show");
+                $("#send-btn").attr("disabled", false);
+                $("#send-input").attr("disabled", false);
+                return "error"
+
+            })
+        }
+
+        const update_user_response = (user_reply) => {
+            let inner_html = `
+            <div class="row border-0 mt-3 mb-3 user-response">
+                <div class="col-2 invisible">
+
+                </div>
+                <div class="text-right d-flex text-dark col align-items-center justify-content-start" >
+                    <input  type="text" 
+                            class="form-control rounded align-items-center justify-content-start" 
+                            value="Sentence1" 
+                            style="background-color:  #F4F8F8" 
+                            disabled>
+                </div>
+                <div class="col-1 d-flex align-items-center justify-content-center mr-3">
+                    <button type="button" class="btn btn-info btn-circle d-flex align-items-center justify-content-center" disabled>
+                        You
+                    </button>
+                </div>
+        
+            </div>
+            `
+            $("#message-panel").append(inner_html);
+
+            let addded_div = $(".user-response").last();
+            let msg = addded_div.children().eq(1).children().first();
+            msg.val(user_reply);
+
+            addded_div.animate({ "opacity": 0 }, 0);
+
+
+        }
+        const update_bot_response = (bot_response) => {
+            let inner_html = `
+            <div class="row border-0 mt-3 mb-3 bot-response">
+                <div class="col-1 d-flex align-items-center justify-content-center ml-3">
+                    <button type="button" class="btn btn-secondary btn-circle d-flex align-items-center justify-content-center" disabled>
+                        Bot
+                    </button>
+                </div>
+                
+                <div class="text-left d-flex flex-grow-1 col align-items-center justify-content-start">
+                    <input  type="text" 
+                            class="form-control rounded align-items-center justify-content-start" 
+                            value="" 
+                            style="background-color: #D1EDEE"
+                            disabled>
+                </div>
+
+                <div class="col-2 invisible">
+
+                </div>
+            </div>
+            `
+
+            $("#message-panel").append(inner_html);
+            let addded_div = $(".bot-response").last();
+            let msg = addded_div.children().eq(1).children().first();
+            msg.val(bot_response);
+            addded_div.animate({ "opacity": 0 }, 0);
+
+
+
+        }
+        const send_response = async () => {
+            let content = $.trim($("#send-input").val());
+            let dialogue = $("#dialogue" + counter_task).val();
+            let topic = $("#topic-display").text();
+            let target_url = base_url + "/api/model/" + current_task + "/interact"
+            // console.log(target_url)
+            $("#send-input").val(content);
+
+            if (content.length === 0) {
+                $("#empty-modal").modal('show');
+                return false
+            }
+            else {
+                let data = {
+                    "text": content,
+                    "end": false,
+                    "seed": $("#seed" + counter_task).val(),
+                    "topic": topic,
+                    "history": dialogue
+                }
+                // console.log(data);
+                $("#send-btn").attr("disabled", true);
+                $("#send-input").attr("disabled", true);
+
+                let result = await post(target_url, data);
+                // console.table(result);
+                if (result !== "error") {
+
+                    $("#send-input").val("");
+                    let user_reply = result[0].user_input;
+                    let bot_response = result[0].response;
+                    update_user_response(user_reply);
+                    update_bot_response(bot_response);
+
+                    counter_round++;
+                    $("#round-counter").html("You have given <b>" + counter_round + "</b> inputs already with this chatbot. ")
+                    dialogue += "u: " + user_reply + "###" + "b: " + bot_response + "###";
+                    $("#dialogue" + counter_task).val(dialogue);
+
+                    let addded_user_div = $(".user-response").last();
+                    let addded_bot_div = $(".bot-response").last();
+                    addded_user_div.animate(
+                        { "opacity": 1 },
+                        300,
+                        () => {
+                            addded_bot_div.animate(
+                                { "opacity": 1 },
+                                300,
+                                () => {
+                                    $("#send-btn").attr("disabled", false);
+                                    $("#send-input").attr("disabled", false);
+                                    let scoll_height = $("#message-panel").prop("scrollHeight");
+                                    $("#message-panel").scrollTop(scoll_height);
+                                    $("#send-input").focus();
+                                }
+                            );
+                        }
+                    );
+
+
+
+                }
+
+                $("#send-btn").attr("disabled", false);
+                $("#send-input").attr("disabled", false);
+                return true
+            }
+        }
+
+
+        const preRender = () => {
+            $("#welcome-panel").show();
+            $("#submit-div").hide();
+            $("#rate-panel").hide();
+            $("#chatbot-panel").show();
+
+
+        }
+
+
+        const initDialogue = () => {
+            $("#welcome-panel").hide();
+            $("#rate-panel").hide();
+            $("#message-panel").html("");
+            $("#chatbot-panel").show();
+
+            current_task = all_hits[counter_task];
+            // console.log(dialogue_start);
+            if (dialogue_start) init_topic_modal();
+            counter_round = 0;
+            let seed = randomSeed();
+            $("#seed" + counter_task).val(seed);
+            $("#task" + counter_task).val(current_task);
+
+            // let topic = await get_single_topic();
+            // $("#topic-input").val(topic);
+
+
+        }
+
+        const randomSeed = () => {
+            return Math.floor(Math.random() * 1000) + 1;
+        }
+
+
+        const show_topic_modal = () => {
+            $("#topic-modal").modal("show");
+        }
+        const init_topic_modal = async () => {
+            dialogue_start = false;
+            $("#topic-modal-body").html(`<div class="form-group">
+                    <label class="col-form-label text-sm-left font-weight-bold">Topic:</label>
+                    <input type="text" autocomplete="off" 
+                            class="form-control rounded mr-sm-1 disabled"
+                            placeholder="" 
+                            id="topic-input"
+                            disabled>
+                </div>
+
+                <hr>
+                <h5 class="small text-left font-weight-bold font-italic" id="topic-modal-error"></h5>
+
+                <h6 class="small text-left">If you intend to change topic in your next input, then press the “Topic” button before you enter your next input.</h6>`);
+            $("#topic-modal-title").html("The topic you need to chat with the bot is shown as below");
+            $("#topic-modal-footer").html(`<button type="button" class="btn btn-primary btn-sm" onclick="submit_topic();">Okay</button>
+                `);
+           
+            let topics = await get_multiple_topic();
+            // console.log(topics)
+            $("#topic-input").val(topics[0]);
+            $("#send-btn").attr("disabled", true);
+            $("#send-btn").toggleClass("btn-outline-primary btn-outline-light");
+            $("#topic-modal").modal("show");
+
+        }
+
+
+
+        const get_single_topic = async () => {
+            let t_url = base_url + "/api/icebreaker";
+            let result = await post(t_url, []);
+            return result.topic;
+        }
+
+        const get_multiple_topic = async () => {
+            let t_url = base_url + "/api/topic_change";
+            let result = await post(t_url, []);
+            return result.topics;
+        }
+        const submit_topic_changes = () => {
+            let topic_change_radio_choice = $(`input[name="topic-change-radio"]:checked`).val();
+            let original_topic = $("#topic-display").text();
+
+            const record_changes = () => {
+
+                let topic_change_opinion_values = $("#topic_change_opinion" + counter_task).val();
+                let topic_chatbot_opinion_values = $("#topic_chatbot_opinion" + counter_task).val();
+                $("#topic_change_opinion" + counter_task).val(topic_change_opinion_values + "#" + counter_round + "@" + topic_change_radio_choice);
+                // $("#topic_chatbot_opinion"+counter_task).val(topic_chatbot_opinion_values+"#"+counter_round+"@"+topic_chatbot_radio_choice);
+            }
+            // ** for removing the condition to choose at least one
+
+            if (topic_change_radio_choice === "No change.") {
+                record_changes();
+                $("#topic-modal").modal("hide");
+                $(`input[name="topic-change-radio"]:checked`).prop('checked', false);
+                $(`input[name="topic-chatbot-radio"]:checked`).prop('checked', false);
+                $("#topic-modal-error").text("");
+            }
+            else {
+                record_changes();
+
+                $("#topic-modal").modal("hide");
+                $(`input[name="topic-change-radio"]:checked`).prop('checked', false);
+                $(`input[name="topic-chatbot-radio"]:checked`).prop('checked', false);
+                $("#topic-modal-error").text("");
+                // init_topic_modal_user_input();
+                $("#topic-display").text(topic_change_radio_choice);
+                // $("#trigger-topic").attr("disabled",true);
+            }
+
+        }
+
+
+        const submit_topic = async () => {
+            let topic_input = $("#topic-input").val().replace(/@/g, " ").replace(/#/g, " ");
+
+            topic_input = $.trim(topic_input).split(/\s+/);
+            let topics = await get_multiple_topic();
+            // console.log(topics);
+            if (topic_input.length == 0 || topic_input[0] === "") {
+                $("#topic-modal-error").text("Error: Invalid or empty topic.");
+            }
+            // else if(typeof topic_change_input === "undefined"){
+            //     $("#topic-modal-error").text("Error: Invalid selection.");
+            // }
+            else {
+                $("#topic-modal").modal("hide");
+                let topic_change_input = $(`input[name="topic-change-radio"]:checked`).text();
+                topic_input = topic_input.join(" ");
+                let task_topic = $("#topic" + counter_task).val();
+                let task_topic_opinion = $("#topic_opinion" + counter_task).val();
+                $("#topic" + counter_task).val(task_topic + "#" + counter_round + "@" + topic_input);
+                $("#topic_opinion" + counter_task).val(task_topic_opinion + "#" + counter_round + "@" + topic_change_input);
+                $("#topic-display").text(topic_input);
+
+
+                let innerHTML = `
+                <div class="form-group" id = "topic-form-group">
+                    <label class="col-form-label font-weight-bold">Please choose one of the topics below:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="topic-change-radio" id="topic-change-radio1" value="">
+                    <label class="form-check-label" for="topic-change-radio1">
+                    
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="topic-change-radio" id="topic-change-radio2" value="">
+                    <label class="form-check-label" for="topic-change-radio2">
+                    
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="topic-change-radio" id="topic-change-radio3" value="">
+                    <label class="form-check-label" for="topic-change-radio3">
+                    
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="topic-change-radio" id="topic-change-radio4" value="">
+                    <label class="form-check-label" for="topic-change-radio4">
+                    
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="topic-change-radio" id="topic-change-radio0" value="no change">
+                    <label class="form-check-label" for="topic-change-radio0">
+                    
+                    </label>
+                </div>                
+                   </div>
+                </div>
+        
+                <h5 class="small text-left font-weight-bold font-italic" id="topic-modal-error"></h5>
+                `
+                $("#topic-modal-body").html(innerHTML);
+                // $("#topic-instruction").text(`According to the chatbot statements about topic `
+                //     + topic_input 
+                //     +`, what do you think the chatbot's overall feeling about it was?`);
+
+                $("#topic-modal-title").html("Topic Change");
+                $("#topic-modal-footer").html(`<button type="button" class="btn btn-primary btn-sm" onclick="submit_topic_changes();">Submit</button>
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Cancel</button>`);
+
+                $("#send-btn").toggleClass("btn-outline-primary btn-outline-light");
+                $("#send-btn").attr("disabled", false);
+                // filling in topic-change-radio values with topic values
+                $("#topic-change-radio1").next().text(topics[1]);
+                $("#topic-change-radio1").val(topics[1]);
+
+                // change the val to the topic
+                $("#topic-change-radio2").next().text(topics[2]);
+                $("#topic-change-radio2").val(topics[2]);
+                $("#topic-change-radio3").next().text(topics[3]);
+                $("#topic-change-radio3").val(topics[3]);
+                $("#topic-change-radio4").next().text(topics[4]);
+                // $("#topic-change-radio4").val(topics[4]);
+                $("#topic-change-radio0").next().text("No change.");
+                $("#topic-change-radio0").val("No change.");
+            }
+
+
+
+
+
+        }
+        window.onload = () => {
+            preRender();
+            let maxHeight = $(window).height();
+            let sendPanelHeight = $("#send-panel").height();
+            let instructionPanelHeight = $("#instruction-panel").height();
+            let topicPanelHeight = $("#topic-panel").height();
+
+            $("#message-panel").height((maxHeight - sendPanelHeight - instructionPanelHeight - topicPanelHeight) * 0.95);
+            //$("#message-panel").height(1000);
+            $("#message-panel").css("overflow-y", "auto");
+            $("#chatbot-panel").hide();
+            for (var i = 0; i < all_hits.length; i++) {
+                // console.log(i);
+                let innerHTML = `
+                <crowd-input name="task###" id="task###" hidden></crowd-input>
+                <crowd-input name="dialogue###" id="dialogue###" hidden></crowd-input>
+                <crowd-input name="seed###" id="seed###" hidden></crowd-input>
+                <crowd-input name="score###" id="score###" hidden></crowd-input>
+                <crowd-input name="topic###" id="topic###" hidden></crowd-input>
+                <crowd-input name="topic_opinion###" id="topic_opinion###" hidden></crowd-input>
+                <crowd-input name="topic_change_opinion###" id="topic_change_opinion###" hidden></crowd-input>
+                <crowd-input name="topic_chatbot_opinion###" id="topic_chatbot_opinion###" hidden></crowd-input>
+                `;
+                innerHTML = innerHTML.replace(/###/g, i);
+                $("#submit-form").append(innerHTML)
+            }
+
+        }
+    </script>
+</footer>
+
+</html>
